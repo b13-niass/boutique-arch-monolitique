@@ -24,7 +24,7 @@ $webRoutes = new Routes();
 
 $webRoutes->addGetRoute('/dettes', ["controller" => BoutiquierController::class, 'action' => 'index']);
 $webRoutes->addGetRoute('/dettes/add', ["controller" => BoutiquierController::class, 'action' => 'addDetteIndex']);
-$webRoutes->addGetRoute('/dettes/liste', ["controller" => BoutiquierController::class, 'action' => 'listeDetteIndex']);
+$webRoutes->addGetRoute('/dettes/liste/page/{page}', ["controller" => BoutiquierController::class, 'action' => 'listeDetteIndexPage']);
 $webRoutes->addGetRoute('/dettes/add/new', ["controller" => BoutiquierController::class, 'action' => 'addDette']);
 // $webRoutes->addGetRoute('/dettes/paiement', ["controller" => BoutiquierController::class, 'action' => 'addDette']);
 $webRoutes->addGetRoute('/dettes/paiement/{id}', ["controller" => BoutiquierController::class, 'action' => 'paiementFormShow']);

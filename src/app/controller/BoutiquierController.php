@@ -6,6 +6,7 @@ use Boutique\App\App;
 use Boutique\Core\Controller;
 use Boutique\Core\Impl\IAuthorize;
 use Boutique\Core\Impl\IFile;
+use Boutique\Core\Impl\IPaginator;
 use Boutique\Core\Impl\ISession;
 use Boutique\Core\Impl\IValidator;
 use Boutique\Core\Session;
@@ -21,9 +22,9 @@ class BoutiquierController extends Controller
     private $detailDetteModel;
     private $paiementModel;
 
-    public function __construct(IValidator $validator, ISession $session, IFile $file, IAuthorize $authorize)
+    public function __construct(IValidator $validator, ISession $session, IFile $file, IAuthorize $authorize, IPaginator $paginator)
     {
-        parent::__construct($validator, $session, $file, $authorize);
+        parent::__construct($validator, $session, $file, $authorize,$paginator);
 
         $this->clientModel = App::getInstance()->getModel('Client');
         $this->detteModel = App::getInstance()->getModel('Dette');
@@ -106,11 +107,12 @@ class BoutiquierController extends Controller
         $data['listesDettesDuClient'] = [];
         if ($this->session->issetE('found_client')) {
             $data['clientFound'] = $this->session->restoreObjectFromSession('Client', 'found_client');
-            // dd($this->clientModel->getEntity());
             $this->clientModel->getEntity()->id = (int) $data['clientFound']->id;
-            // dd($this->clientModel->getDettesNonSolder());
-            $data['listesDettesDuClient'] = $this->clientModel->getDettesNonSolder();
-            // dd($data['listesDettesDuClient']);
+            $listesDettesDuClient = $this->clientModel->getDettesNonSolder();
+            $this->paginator->initialize($listesDettesDuClient,3, 1);
+            $data['listesDettesDuClient'] = $this->paginator->getItems();
+            $data['paginationHtml'] = $this->paginator->render("/dettes/liste/page/");
+            $this->session->set('etat_dettes', 'NON SOLDER');
             $data['etat'] = ['NON SOLDER', 'SOLDER'];
             $this->renderView('/boutiquier/liste_dette', $data);
         } else {
@@ -126,9 +128,17 @@ class BoutiquierController extends Controller
             $this->clientModel->getEntity()->id = (int) $data['clientFound']->id;
             // dd($_POST['etat']);
             if (isset($_POST['etat']) &&  $_POST['etat'] == "NON SOLDER") {
-                $data['listesDettesDuClient'] = $this->clientModel->getDettesNonSolder();
+                $listesDettesDuClient = $this->clientModel->getDettesNonSolder();
+                $this->paginator->initialize($listesDettesDuClient,3, 1);
+                $data['listesDettesDuClient'] = $this->paginator->getItems();
+                $this->session->set('etat_dettes', 'NON SOLDER');
+                $data['paginationHtml'] = $this->paginator->render("/dettes/liste/page/");
             } else {
-                $data['listesDettesDuClient'] = $this->clientModel->getDettesSolder();
+                $listesDettesDuClient = $this->clientModel->getDettesSolder();
+                $this->paginator->initialize($listesDettesDuClient,3, 1);
+                $data['listesDettesDuClient'] = $this->paginator->getItems();
+                $this->session->set('etat_dettes', 'SOLDER');
+                $data['paginationHtml'] = $this->paginator->render("/dettes/liste/page/");
             }
             $data['selectedEtat'] =  $_POST['etat'];
             $data['etat'] = ['NON SOLDER', 'SOLDER'];
@@ -137,6 +147,33 @@ class BoutiquierController extends Controller
             $this->redirect('/dettes');
         }
     }
+
+    public function listeDetteIndexPage($page){
+        $data = [];
+        $data['listesDettesDuClient'] = [];
+        if ($this->session->issetE('found_client')) {
+            $data['clientFound'] = $this->session->restoreObjectFromSession('Client', 'found_client');
+            $this->clientModel->getEntity()->id = (int) $data['clientFound']->id;
+            // dd($_POST['etat']);
+            if ($this->session->issetE('etat_dettes') &&  $this->session->get('etat_dettes') == "NON SOLDER") {
+                $listesDettesDuClient = $this->clientModel->getDettesNonSolder();
+                $this->paginator->initialize($listesDettesDuClient,3, $page);
+                $data['listesDettesDuClient'] = $this->paginator->getItems();
+                $data['paginationHtml'] = $this->paginator->render("/dettes/liste/page/");
+            } else {
+                $listesDettesDuClient = $this->clientModel->getDettesSolder();
+                $this->paginator->initialize($listesDettesDuClient,3, $page);
+                $data['listesDettesDuClient'] = $this->paginator->getItems();
+                $data['paginationHtml'] = $this->paginator->render("/dettes/liste/page/");
+            }
+            $data['selectedEtat'] =  $this->session->get('etat_dettes');
+            $data['etat'] = ['NON SOLDER', 'SOLDER'];
+            $this->renderView('/boutiquier/liste_dette', $data);
+        } else {
+            $this->redirect('/dettes');
+        }
+    }
+
     public function addClient()
     {
         $_POST['password'] = $this->hasherPassword("passer@1");
