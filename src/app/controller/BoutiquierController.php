@@ -387,6 +387,27 @@ class BoutiquierController extends Controller
         }
     }
 
+    public function paiementArticles($id){
+        $data = [];
+        $dette_id = (int) trim($id);
+        $data['listesDettesDuClient'] = [];
+        if ($this->session->issetE('found_client')) {
+            $data['clientFound'] = $this->session->restoreObjectFromSession('Client', 'found_client');
+            if (isset($dette_id) && !empty($dette_id)) {
+                $data['laDette'] = $this->detteModel->find(['id' => $dette_id]);
+
+                $this->clientModel->getEntity()->id = $data['clientFound']->id;
+                $data['laDette']->total_dette = $this->clientModel->getMontantTotalDette($data['laDette']->id);
+                $data['laDette']->montant_verse = $this->clientModel->getMontantVerserDette($data['laDette']->id);
+                $this->detteModel->getEntity()->id = $data['laDette']->id;
+
+                $data['listeArticles'] = $this->detteModel->getArticles($dette_id);
+
+                $this->renderView('/boutiquier/liste_article', $data);
+            }
+        }
+    }
+
     public function hasherPassword($password)
     {
         return password_hash($password, PASSWORD_DEFAULT);

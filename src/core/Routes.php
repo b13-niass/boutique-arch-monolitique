@@ -51,13 +51,8 @@ class Routes implements IRoute
                         $reflectionClass = new \ReflectionClass($controllerName);
 
                         if ($reflectionClass->isInstantiable()) {
+
                             $controller = App::getInstance()->getContainer()->get($controllerName);
-//                            $controller = $reflectionClass->newInstance(
-//                                App::getValidator(),
-//                                App::getSession(),
-//                                App::getFileUploadSystem(),
-//                                App::getAuthorize()
-//                            );
 
                             if ($reflectionClass->hasMethod($actionName)) {
                                 $reflectionMethod = $reflectionClass->getMethod($actionName);

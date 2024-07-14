@@ -47,6 +47,8 @@
                                         Paiement</th>
                                     <th scope="col" class="bg-[#f8f9fb] dark:bg-box-dark-up px-4 py-3.5 text-end text-body dark:text-title-dark text-[15px] font-medium border-none before:hidden rounded-e-[6px] capitalize">
                                         List</th>
+                                    <th scope="col" class="bg-[#f8f9fb] dark:bg-box-dark-up px-4 py-3.5 text-end text-body dark:text-title-dark text-[15px] font-medium border-none before:hidden rounded-e-[6px] capitalize">
+                                        Articles</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,7 +58,7 @@
                                 ?>
                                         <tr class="group">
                                             <td class="px-4 py-2.5 font-normal last:text-end capitalize text-[14px] text-dark dark:text-title-dark border-none group-hover:bg-transparent  whitespace-nowrap">
-                                                <?= $dette->date ?>
+                                                <?= (new DateTime($dette->date))->format('d-m-Y') ?>
                                             </td>
                                             <td class="px-4 py-2.5 font-normal last:text-end lowercase text-[14px] text-dark dark:text-title-dark border-none group-hover:bg-transparent  whitespace-nowrap">
                                                 <?= $dette->total_dette ?></td>
@@ -79,6 +81,13 @@
                                                     <button type="submit" class="px-[30px] h-[44px] text-white bg-primary border-primary hover:bg-primary-hbr font-medium rounded-4 text-sm w-full sm:w-auto text-center inline-flex items-center justify-center capitalize transition-all duration-300 ease-linear" data-te-ripple-init="" data-te-ripple-color="light">Voir</button>
                                                 </form>
                                                 <span class="<?= (int)$dette->montant_verse == 0 ? '' : 'hidden' ?> bg-danger rounded-[15px] py-[4px] px-[8.23px] text-[12px] font-medium leading-[13px] text-center text-white">Pas de paiement</span>
+                                            </td>
+
+                                            <td class="px-4 py-2.5 font-normal last:text-end capitalize text-[14px] text-dark dark:text-title-dark border-none group-hover:bg-transparent  whitespace-nowrap">
+
+                                                <a href="/dettes/paiement/<?=$dette->id?>/articles" class="px-[30px] h-[44px] text-white bg-primary border-primary hover:bg-primary-hbr font-medium rounded-4 text-sm w-full sm:w-auto text-center inline-flex items-center justify-center capitalize transition-all duration-300 ease-linear">
+                                                    Articles
+                                                </a>
                                             </td>
                                         </tr>
 

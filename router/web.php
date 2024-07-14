@@ -28,6 +28,7 @@ $webRoutes->addGetRoute('/dettes/liste', ["controller" => BoutiquierController::
 $webRoutes->addGetRoute('/dettes/add/new', ["controller" => BoutiquierController::class, 'action' => 'addDette']);
 // $webRoutes->addGetRoute('/dettes/paiement', ["controller" => BoutiquierController::class, 'action' => 'addDette']);
 $webRoutes->addGetRoute('/dettes/paiement/{id}', ["controller" => BoutiquierController::class, 'action' => 'paiementFormShow']);
+$webRoutes->addGetRoute('/dettes/paiement/{id}/articles', ["controller" => BoutiquierController::class, 'action' => 'paiementArticles']);
 // $webRoutes->addGetRoute('/error404', ["controller" => ErrorController::class, "action" => "paiementFormShow"]);
 
 $webRoutes->addPostRoute('/dettes/client', ["controller" => BoutiquierController::class, 'action' => 'addClient']);
