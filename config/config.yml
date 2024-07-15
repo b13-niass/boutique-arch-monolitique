@@ -25,6 +25,10 @@ services:
 
   Boutique\Core\Impl\IAuthorize:
     class: Boutique\Core\Authorize
+
+  auth:
+    class: Boutique\Core\AuthMiddleware
+
 parameters:
   DB_HOST: localhost
   DB_NAME: maboutique2

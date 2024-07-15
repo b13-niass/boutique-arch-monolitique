@@ -83,6 +83,7 @@ class BoutiquierController extends Controller
 
             if ($this->session->issetE('panier')) {
                 $data['panier'] = $this->session->restoreObjectsFromSessionArray('Article', 'panier');
+//                dd($data['panier']);
                 foreach ($data['panier'] as $dp) {
                     $data['montant_total'] += $dp->prix * $dp->qte;
                 }
@@ -101,6 +102,7 @@ class BoutiquierController extends Controller
             $this->redirect('/dettes');
         }
     }
+
     public function listeDetteIndex()
     {
         $data = [];
@@ -254,7 +256,7 @@ class BoutiquierController extends Controller
             if ($this->session->issetE('current_article')) {
                 $client = $this->session->restoreObjectFromSession('Client', 'found_client');
                 $article = $this->session->restoreObjectFromSession('Article', 'current_article');
-
+                $article_origine = clone $article;
 
                 $errors = $this->validator->validate($_POST, [
                     'quantite' => ['required', 'number']
@@ -262,11 +264,30 @@ class BoutiquierController extends Controller
                 if (count($errors) > 0) {
                     $this->session->set('errorAdd', $errors);
                 } else {
+                    $cpt = 0;
                     if ($article->qte >= (int) $_POST['quantite']) {
 
-                        $article->qte = (int) $_POST['quantite'];
-
-                        $this->session->saveObjectToSessionArray($article, 'panier');
+                        if ($this->session->issetE('panier')) {
+                            $data['panier'] = $this->session->restoreObjectsFromSessionArray('Article', 'panier');
+                            foreach ($data['panier'] as $key => $dp) {
+                                if ($article_origine->libelle == $dp->libelle){
+                                    $cpt++;
+                                    $data['panier'][$key]->qte += (int) $_POST['quantite'];
+                                    if($data['panier'][$key]->qte > $article_origine->qte){
+                                        $errors['quantite'] = 'Quantité insufisante';
+                                        $this->session->set('errorAdd', $errors);
+                                    }else{
+                                        $this->session->unset('panier');
+                                        $this->session->saveObjectsToSessionArray($data['panier'], 'panier');
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if($cpt == 0){
+                            $article->qte = (int) $_POST['quantite'];
+                            $this->session->saveObjectToSessionArray($article, 'panier');
+                        }
                     } else {
                         $errors['quantite'] = 'Quantité insufisante';
                         $this->session->set('errorAdd', $errors);
