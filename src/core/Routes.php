@@ -76,8 +76,8 @@ class Routes implements IRoute
                 throw new \Exception("Invalid route target for route {$route}");
             }
         }
-
-        ErrorController::loadView(HttpCode::Code404);
+        $errorController = App::getInstance()->getContainer()->get(ErrorController::class);
+        $errorController->loadView(HttpCode::Code404);
         exit();
     }
 }
