@@ -307,6 +307,7 @@ class BoutiquierController extends Controller
     {
         $client = $this->session->restoreObjectFromSession('Client', 'found_client');
         $articles = $this->session->restoreObjectsFromSessionArray('Article', 'panier');
+        $this->detteModel->setTable();
         $resultsaveDette = $this->detteModel->save([
             'client_id' => $client->id,
             'utilisateur_id' => 1,
@@ -315,13 +316,23 @@ class BoutiquierController extends Controller
         ]);
 
         foreach ($articles as $article) {
+            $this->detailDetteModel->setTable();
             $this->detailDetteModel->save([
                 'article_id' => $article->id,
                 'dette_id' => $resultsaveDette,
                 'prix' => $article->prix,
                 'qte' => $article->qte,
             ]);
+
+            $article_to_update = $this->articleModel->find(["id" => $article->id]);
+            $article_to_update->qte -= $article->qte;
+            $this->articleModel->setTable();
+            $result = $this->articleModel::update([
+                "qte" => $article_to_update->qte,
+                "id" => $article_to_update->id
+            ]);
         }
+
         $this->session->unset('panier');
         $this->session->unset('current_article');
 

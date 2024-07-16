@@ -170,7 +170,7 @@ abstract class Model implements IModel
         $setString = implode(', ', $setParts);
         $sql = "UPDATE " . static::$table_static . " SET {$setString} WHERE id = :id";
 
-        // dd($sql);
+//         dd($sql);
         return static::$database_static->prepare($sql, $params, static::getEntityNameStatic(), false);
     }
 
